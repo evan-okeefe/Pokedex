@@ -10,8 +10,8 @@ import java.nio.file.Path;
 public class Pokedex {
 
     //Save 2 arrays (I rlly only need one, but need full credit on this project)
-    Pokemon[] pokemon;
-    Pokemon[] grassTypes;
+    private Pokemon[] pokemon;
+    private Pokemon[] grassTypes;
 
     //When a new pokedex is created, parse the JSON file
     public Pokedex() throws IOException {
@@ -154,7 +154,7 @@ public class Pokedex {
 
         //We start by making a new array, thats equal to 1 MORE than the pokemon array
         Pokemon[] newArray = new Pokemon[pokemon.length + 1];
-        newArray[pokemon.length] = _p;
+        newArray[newArray.length - 1] = _p;
 
         //Then we add all the old pokemon into the new list.
         for (int i = 0; i < pokemon.length; i++) {
@@ -165,7 +165,7 @@ public class Pokedex {
         JSONArray jsonArray = new JSONArray();
 
         //We loop through each pokemon
-        for (Pokemon p : pokemon) {
+        for (Pokemon p : newArray) {
             //For each pokemon we make a new JSON Object
             JSONObject obj = new JSONObject();
             //We then put ALL OF THE DATA from the pokemon into the JSON object
@@ -189,6 +189,8 @@ public class Pokedex {
         //Finally we write the JSONArray into a file
         Files.writeString(Path.of("src/data/pokemon.json"),
                 jsonArray.toString(2));
+
+        System.out.println("Did it");
 
         //And call everyone's favorite function again
         parse();

@@ -16,16 +16,16 @@ import java.io.IOException;
 public class Main {
 
     //Save these for referencing later
-    static Pokedex pokedex;
-    static JTextPane display;
-    static JTextField input;
+    private static Pokedex pokedex;
+    private static JTextPane display;
+    private static JTextField input;
 
     //Sets the Current Pokemon to the first one in the list
-    static int currentPokemon = 0;
+    private static int currentPokemon = 0;
 
     //Variables that allow me to create a new pokemon
-    static boolean creating = false;
-    static int creatingStep = -1;
+    private static boolean creating = false;
+    private static int creatingStep = -1;
 
     //Variables that store info about the pokemon im creating
     private static String name;
@@ -40,7 +40,7 @@ public class Main {
     private static String type2;
     private static String classification;
     private static int generation;
-    static Pokemon p;
+    private static Pokemon p;
 
     public static void main(String[] args) throws IOException {
         //Create a new window and set some of its properties
@@ -220,11 +220,13 @@ public class Main {
         //The refresh not only refreshes the pokedex, but also "resets" the program
         pokedex.parse();
         display.setText("""
-                Welcome to the Pokédex!
-                To start, type the name of a pokémon in the search bar and press the search button!
-                Or click either arrow to cycle through the pokémon.
-                
-                Press the reload button to come back to this page""");
+        Welcome to the Pokédex!
+        To start, type the name of a pokémon in the search bar and press the search button!
+        Or click either arrow to cycle through the pokémon.
+
+        Press the reload button to come back to this page
+        
+        You can also press the \"Camera\" in the top right corner to create a new Pokémon""");
         currentPokemon = 0;
     }
 
