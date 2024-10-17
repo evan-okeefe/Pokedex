@@ -8,71 +8,79 @@ import java.util.ArrayList;
 
 public class Pokedex {
 
-    private ArrayList<String> names = new ArrayList<>();
-    private ArrayList<String> jNames = new ArrayList<>();
-    private ArrayList<Integer> hp = new ArrayList<>();
-    private ArrayList<Integer> defense = new ArrayList<>();
-    private ArrayList<Integer> attack = new ArrayList<>();
-    private ArrayList<String> abilities = new ArrayList<>();
-    private ArrayList<Double> height = new ArrayList<>();
-    private ArrayList<Double> weight = new ArrayList<>();
-    private ArrayList<String> type1 = new ArrayList<>();
-    private ArrayList<String> type2 = new ArrayList<>();
-    private ArrayList<String> classification = new ArrayList<>();
-    private ArrayList<Integer> generation = new ArrayList<>();
-
+    Pokemon[] pokemon;
 
     public Pokedex() throws IOException {
         String file = Files.readString(Path.of("src/pokemon.json"));
 
         JSONArray jsonArray = new JSONArray(file);
 
+        pokemon = new Pokemon[jsonArray.length()];
+
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
-            names.add(obj.getString("name"));
-            jNames.add(obj.getString("japanese_name"));
-            hp.add(obj.getInt("hp"));
-            defense.add(obj.getInt("defense"));
-            attack.add(obj.getInt("attack"));
-            abilities.add(obj.getString("abilities"));
+            String name = obj.getString("name");
+            String jName = obj.getString("japanese_name");
+            int hp = obj.getInt("hp");
+            int defense = obj.getInt("defense");
+            int attack = obj.getInt("attack");
+            String ability = obj.getString("abilities");
+
+            double height = 0;
             if (obj.get("height_m") instanceof BigDecimal){
-                height.add(obj.getBigDecimal("height_m").doubleValue());
+                height = obj.getBigDecimal("height_m").doubleValue();
             }
             else if (obj.get("height_m") instanceof Integer) {
-                height.add((double) obj.getInt("height_m"));
+                height = (double) obj.getInt("height_m");
             }
             else if (obj.get("height_m") instanceof String) {
-                height.add(0.0);
+                height = 0.0;
             }
             else{
                 System.out.println("Failed to add height_m of " + i);
             }
 
+            double weight = 0;
             if (obj.get("weight_kg") instanceof BigDecimal){
-                height.add(obj.getBigDecimal("height_m").doubleValue());
+                weight = obj.getBigDecimal("height_m").doubleValue();
             }
             else if (obj.get("weight_kg") instanceof Integer) {
-                height.add((double) obj.getInt("height_m"));
+                weight = (double) obj.getInt("height_m");
             }
             else if (obj.get("weight_kg") instanceof String) {
-                height.add(0.0);
+                weight = 0.0;
             }else{
                 System.out.println("Failed to add weight_kg of " + i);
             }
-            type1.add(obj.getString("type1"));
-            type2.add(obj.getString("type2"));
-            classification.add(obj.getString("classfication"));
-            generation.add(obj.getInt("generation"));
+
+            String type1 = obj.getString("type1");
+            String type2 = obj.getString("type2");
+            String classification = obj.getString("classfication");
+            int generation = obj.getInt("generation");
+
+
+            pokemon[i] = new Pokemon(name, jName, hp, defense, attack, ability, height,
+                    weight, type1, type2, classification, generation);
         }
-        System.out.println("Finished!");
     }
 
+
     public int search(String s){
-        for (String n : names){
-            if (n.equals(s)){
-                return names.indexOf(n);
+        int counter = 0;
+        for (Pokemon p : pokemon){
+            if (p.getName().equals(s)){
+                return counter;
             }
+            counter++;
         }
         return -1;
+    }
+
+    public Pokemon getPokemon(int i){
+        return pokemon[i];
+    }
+
+    public Pokemon getPokemon(String s){
+        return pokemon[search(s)];
     }
 }
