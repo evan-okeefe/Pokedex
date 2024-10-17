@@ -1,3 +1,5 @@
+package files;
+
 public class Pokemon {
     private String name;
     private String jName;
@@ -30,6 +32,21 @@ public class Pokemon {
         }
         classification = _classification;
         generation = _generation;
+    }
+
+    public Pokemon() {
+        name = "unknown";
+        jName = "unknown";
+        hp = 0;
+        defense = 0;
+        attack = 0;
+        abilities = "unknown";
+        height = 0.0;
+        weight = 0.0;
+        type1 = "unknown";
+        type2 = "unknown";
+        classification = "unknown";
+        generation = 0;
     }
 
     public String getName() {
@@ -80,19 +97,24 @@ public class Pokemon {
         return generation;
     }
 
+    private String clean(String s){
+        return s.replace("'", "").replace("[", "").replace("]", "");
+
+    }
+
+    private String clean(double i){
+        if (i % 1 == 0) {
+            return String.valueOf((int) i); // Remove decimal if it's a whole number
+        } else {
+            return String.valueOf(i); // Keep decimal if it's not
+        }
+    }
+
     @Override
     public String toString() {
-        return name +":\n" +
-                "   Japanese Name = " + jName + '\n' +
-                "   hp = " + hp + '\n' +
-                "   defense = " + defense+ '\n' +
-                "   attack = " + attack + '\n' +
-                "   abilities = " + abilities + '\n' +
-                "   height = " + height + "m\n" +
-                "   weight = " + weight + "kg\n" +
-                "   type1 = " + type1 + '\n' +
-                "   type2 = " + type2 + '\n' +
-                "   classification = " + classification + '\n' +
-                "   generation = " + generation;
+        if (type2.equals("n/a")){
+            return name + "\n(" + jName + ")\n\n"+ clean(height) + "m, " + clean(weight) +"kg\n" + hp + "h/" + defense + "d/" + attack + "a\nAbilities:\n" + clean(abilities) + "\n\n" + name + ", a " + classification + ", is a gen " + generation + " pokémon. This is a " + type1 + " type.";
+        }
+        return name + "\n(" + jName + ")\n\n"+ clean(height) + "m, " + clean(weight) +"kg\n" + hp + "h/" + defense + "d/" + attack + "a\nAbilities:\n" + clean(abilities) + "\n\n" + name + ", a " + classification + ", is a gen " + generation + " pokémon. This is a " + type1 + "/" + type2 + " type.";
     }
 }
