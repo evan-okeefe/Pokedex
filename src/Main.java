@@ -15,16 +15,19 @@ import java.io.IOException;
 
 public class Main {
 
+    //Save these for referencing later
     static Pokedex pokedex;
     static JTextPane display;
     static JTextField input;
 
+    //Sets the Current Pokemon to the first one in the list
     static int currentPokemon = 0;
 
+    //Variables that allow me to create a new pokemon
     static boolean creating = false;
-
     static int creatingStep = -1;
 
+    //Variables that store info about the pokemon im creating
     private static String name;
     private static String jName;
     private static int hp;
@@ -40,6 +43,7 @@ public class Main {
     static Pokemon p;
 
     public static void main(String[] args) throws IOException {
+        //Create a new window and set some of its properties
         JFrame frame = new JFrame("Pokédex");
         int width = 440;
         int height = 740;
@@ -50,6 +54,7 @@ public class Main {
         Image scaledImage = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         frame.setIconImage(scaledImage);
 
+        //Create a panel with a background image
         JPanel panel = new JPanel() {
             final BufferedImage backgroundImage = ImageIO.read(new File("src/assets/background.png"));
 
@@ -60,9 +65,9 @@ public class Main {
             }
         };
 
-        // Large text
+        //Create the large text box in the center, set some of its values, make the text centered, and add it to the panel
         display = new JTextPane();
-        display.setBounds(30, 179, 383, 332);  // Adjusted for placement
+        display.setBounds(30, 179, 383, 332);
         display.setFont(new Font("Arial", Font.PLAIN, 16));
         display.setEditable(false);
         display.setEnabled(false);
@@ -84,14 +89,15 @@ public class Main {
         You can also press the \"Camera\" in the top right corner to create a new Pokémon""");
         panel.add(display);
 
-        // Input
+        //Create the input field near the bottom of the screen
         input = new JTextField();
         input.setBounds(24, 549, 250, 89);
         input.setFont(new Font("Arial", Font.PLAIN, 30));
         input.setBackground(Color.white);
         panel.add(input);
 
-        // Buttons
+        //Create the buttons, set their values, link them to their correlating functions, and add them to the panel
+        //Search Button
         JButton searchButton = new JButton();
         searchButton.setOpaque(false);
         searchButton.setContentAreaFilled(false);
@@ -109,6 +115,7 @@ public class Main {
         });
         panel.add(searchButton);
 
+        //Left Arrow
         JButton leftArrowButton = new JButton();
         leftArrowButton.setOpaque(false);
         leftArrowButton.setContentAreaFilled(false);
@@ -122,6 +129,7 @@ public class Main {
         });
         panel.add(leftArrowButton);
 
+        //Right Arrow Button
         JButton rightArrowButton = new JButton();
         rightArrowButton.setOpaque(false);
         rightArrowButton.setContentAreaFilled(false);
@@ -135,6 +143,7 @@ public class Main {
         });
         panel.add(rightArrowButton);
 
+        //New Pokemon button
         JButton newButton = new JButton();
         newButton.setOpaque(false);
         newButton.setContentAreaFilled(false);
@@ -148,6 +157,7 @@ public class Main {
         });
         panel.add(newButton);
 
+        //Refresh button
         JButton refreshButton = new JButton();
         refreshButton.setOpaque(false);
         refreshButton.setContentAreaFilled(false);
@@ -156,33 +166,44 @@ public class Main {
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                refreshPressed();
+                try {
+                    refreshPressed();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         panel.add(refreshButton);
 
-        panel.setLayout(null);
-        frame.add(panel);
+        //Add the panel to the frame
         panel.setLayout(null);
         frame.add(panel);
 
+        //Create a new pokedex
         pokedex = new Pokedex();
 
+        //Show the window
         frame.setVisible(true);
     }
 
+    //Function for when the search button is pressed
     private static void searchPressed() throws IOException {
+        //If we are creating a new pokemon, call a different function
         if (creating){
             createSearchPressed();
             return;
         }
+        //Search for the pokemon with the name the user inputs
         Pokemon p = pokedex.getPokemon(input.getText());
 
+        //Get the index of the pokemon
         int i = pokedex.getPokemonIndex(p);
 
+        //If i is -1, then the pokemon doesnt exist
         if (i == -1){
             invalidPokemon();
         }
+        //Otherwise, we update the current pokemon, and set that text on screen
         else{
             currentPokemon = i;
             updateText();
@@ -190,10 +211,14 @@ public class Main {
 
     }
 
-    private static void refreshPressed(){
+    //Function for when the refresh button is pressed
+    private static void refreshPressed() throws IOException {
+        //If we are creating a new pokemon, return (so nothing breaks)
         if (creating){
             return;
         }
+        //The refresh not only refreshes the pokedex, but also "resets" the program
+        pokedex.parse();
         display.setText("""
                 Welcome to the Pokédex!
                 To start, type the name of a pokémon in the search bar and press the search button!
@@ -203,28 +228,36 @@ public class Main {
         currentPokemon = 0;
     }
 
+    //Fuction for when the left arrow is pressed
     private static void leftPressed(){
+        //If we are creating a new pokemon, return
         if (creating){
             return;
         }
+        //Check if the active pokemon is above zero, if so go back one pokemon and update the screen
         if (currentPokemon > 0){
             currentPokemon--;
             updateText();
         }
-        else if (currentPokemon == 0){
+        //If not, loop around to the END of the pokemon list and update the screen
+        else {
             currentPokemon = pokedex.getNumPokemon();
             updateText();
         }
     }
 
+    //Function for when the right arrow is pressed
     private static void rightPressed(){
+        //If we are creating a new pokemon, return
         if (creating){
             return;
         }
+        //Check if the active pokemon is less than the max, if so go forward one pokemon and update the screen
         if (currentPokemon < pokedex.getNumPokemon()){
             currentPokemon++;
             updateText();
         }
+        //If not, loop around to the START of the pokemon list and update the screen
         else if (currentPokemon == pokedex.getNumPokemon()){
             currentPokemon = 0;
             updateText();
@@ -232,18 +265,25 @@ public class Main {
     }
 
     private static void newPokemon(){
+        //If we are creating a new pokemon, return
         if (creating){
             return;
         }
+        //Set creating to true which stops all other buttons from working, set the text to the start of the "Create a pokemon" phase, and increments creatingsteps by 1
         creating = true;
         display.setText("""
                 Welcome to \"Create-a-Pokémon\"
                 Press the search button to continue""");
         creatingStep += 1;
-        System.out.println(creatingStep);
     }
 
+    /*
+   Preconditions: creating must be true
+   Postcondition: Steps are taken to create a pokemon
+    */
     private static void createSearchPressed() throws IOException {
+        //This function only runs when we are creating
+        //The creating just started
         if (creatingStep == 0){
             display.setText("""
                 Enter the Pokémon's name into the search bar
@@ -251,6 +291,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons name
         else if (creatingStep == 1){
             name = input.getText();
             input.setText("");
@@ -261,6 +302,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons japanese name
         else if (creatingStep == 2){
             jName = input.getText();
             input.setText("");
@@ -270,6 +312,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons HP
         else if (creatingStep == 3){
             hp = Integer.parseInt(input.getText());
             input.setText("");
@@ -279,6 +322,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons defense
         else if (creatingStep == 4){
             defense = Integer.parseInt(input.getText());
             input.setText("");
@@ -288,6 +332,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons attack
         else if (creatingStep == 5){
             attack = Integer.parseInt(input.getText());
             input.setText("");
@@ -298,6 +343,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons abilities
         else if (creatingStep == 6){
             abilities = input.getText();
             input.setText("");
@@ -307,6 +353,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons height
         else if (creatingStep == 7){
             height = Double.parseDouble(input.getText());
             input.setText("");
@@ -316,6 +363,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons weight
         else if (creatingStep == 8){
             weight = Double.parseDouble(input.getText());
             input.setText("");
@@ -325,6 +373,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons main type
         else if (creatingStep == 9){
             type1 = input.getText();
             input.setText("");
@@ -335,6 +384,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons secondary type
         else if (creatingStep == 10){
             type2 = input.getText();
             input.setText("");
@@ -344,6 +394,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons classification
         else if (creatingStep == 11){
             classification = input.getText();
             input.setText("");
@@ -353,6 +404,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Get pokemons generation
         else if (creatingStep == 12){
             generation = Integer.parseInt(input.getText());
             input.setText("");
@@ -362,6 +414,7 @@ public class Main {
                 Press the search button when you are ready to continue""");
             creatingStep++;
         }
+        //Display the pokemons info to the user, to confirm
         else if (creatingStep == 13){
             p = new Pokemon(name, jName, hp, defense, attack, abilities, height,
                     weight, type1, type2, classification, generation);
@@ -369,6 +422,7 @@ public class Main {
             display.setText(p.toString());
             creatingStep++;
         }
+        //Create a new pokemon in the json with all the info we collected
         else if (creatingStep == 14){
             pokedex.createPokemon(p);
             creatingStep = -1;
@@ -377,6 +431,7 @@ public class Main {
         }
     }
 
+    //Sets the text in the center of the screen to info about the current pokemon
     private static void updateText(){
         Pokemon p = pokedex.getPokemon(currentPokemon);
 
@@ -384,6 +439,7 @@ public class Main {
         input.setText("");
     }
 
+    //This gets called when the pokemon the user searches for can't be found. Sets the center text
     private static void invalidPokemon() {
         display.setText("Unknown Pokémon: \"" + input.getText() +"\".\n\nMake sure you spelled the name of the pokémon correctly.\n(\"Charzard\" and \"Charizard\" are not the same )\n\nYou can also use the arrow keys to traverse the Pokémon");
     }
