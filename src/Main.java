@@ -1,3 +1,4 @@
+import files.Battle;
 import files.Pokedex;
 import files.Pokemon;
 
@@ -42,6 +43,9 @@ public class Main {
     private static int generation;
     private static Pokemon p;
 
+    private static Pokemon pToFight1 = null;
+    private static Pokemon pToFight2 = null;
+
     public static void main(String[] args) throws IOException {
         //Create a new window and set some of its properties
         JFrame frame = new JFrame("Pokédex");
@@ -71,8 +75,8 @@ public class Main {
         display.setFont(new Font("Arial", Font.PLAIN, 16));
         display.setEditable(false);
         display.setEnabled(false);
+        display.setOpaque(false);
         display.setDisabledTextColor(Color.black);
-        display.setBackground(Color.white);
 
         StyledDocument doc = display.getStyledDocument();
         SimpleAttributeSet center = new SimpleAttributeSet();
@@ -86,14 +90,15 @@ public class Main {
 
         Press the reload button to come back to this page
         
-        You can also press the \"Camera\" in the top right corner to create a new Pokémon""");
+        You can also press the \"Camera\" in the top right corner to create a new Pokémon or the red button at the top to simulate a battle between 2 pokémon
+        """);
         panel.add(display);
 
         //Create the input field near the bottom of the screen
         input = new JTextField();
         input.setBounds(24, 549, 250, 89);
         input.setFont(new Font("Arial", Font.PLAIN, 30));
-        input.setBackground(Color.white);
+        input.setOpaque(false);
         panel.add(input);
 
         //Create the buttons, set their values, link them to their correlating functions, and add them to the panel
@@ -110,6 +115,7 @@ public class Main {
                     searchPressed();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
+
                 }
             }
         });
@@ -175,6 +181,20 @@ public class Main {
         });
         panel.add(refreshButton);
 
+        //Battle button
+        JButton battleButton = new JButton();
+        battleButton.setOpaque(false);
+        battleButton.setContentAreaFilled(false);
+        battleButton.setBorderPainted(false);
+        battleButton.setBounds(155, 12, 45, 45);
+        battleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                battlePressed();
+            }
+        });
+        panel.add(battleButton);
+
         //Add the panel to the frame
         panel.setLayout(null);
         frame.add(panel);
@@ -226,7 +246,7 @@ public class Main {
 
         Press the reload button to come back to this page
         
-        You can also press the \"Camera\" in the top right corner to create a new Pokémon""");
+        You can also press the \"Camera\" in the top right corner to create a new Pokémon or the red button at the top to simulate a battle between 2 pokémon""");
         currentPokemon = 0;
     }
 
@@ -263,6 +283,29 @@ public class Main {
         else if (currentPokemon == pokedex.getNumPokemon()){
             currentPokemon = 0;
             updateText();
+        }
+    }
+
+    private static void battlePressed() {
+        //If we are creating a new pokemon, return
+        if (creating){
+            return;
+        }
+
+        if (pToFight1 == null){
+            pToFight1 = pokedex.getPokemon(currentPokemon);
+            display.setText("Set " + pToFight1.getName() + " as the first pokémon to battle!");
+
+        }
+        else if (pToFight2 == null){
+            pToFight2 = pokedex.getPokemon(currentPokemon);
+            display.setText("Set " + pToFight2.getName() + " as the second pokémon to battle!\n\nClick the battle button one more time to commence the battle.");
+        }
+        else{
+            Battle b = new Battle(pToFight1, pToFight2);
+            display.setText(b.start());
+            pToFight1 = null;
+            pToFight2 = null;
         }
     }
 
