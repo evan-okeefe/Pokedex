@@ -4,8 +4,8 @@ import java.util.Random;
 
 public class Battle {
 
-    private Pokemon p1;
-    private Pokemon p2;
+    private final Pokemon p1;
+    private final Pokemon p2;
 
     private double health1;
     private double health2;
@@ -16,14 +16,6 @@ public class Battle {
 
         health1 = p1.getHp();
         health2 = p2.getHp();
-    }
-
-    public Pokemon getP1() {
-        return p1;
-    }
-
-    public Pokemon getP2() {
-        return p2;
     }
 
     public String start(){

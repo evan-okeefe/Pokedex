@@ -20,7 +20,7 @@ public class Pokemon {
     Postcondition: A pokemon is created
      */
     public Pokemon(String _name, String _jName, int _hp, int _defense, int _attack, String _abilities, double _height, double _weight, String _type1, String _type2, String _classification, int _generation) {
-        //Initilize all the variables
+        //Initialize all the variables
         name = _name;
         jName = _jName;
         hp = _hp;
